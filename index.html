@@ -2874,7 +2874,7 @@ var GijiAddon = (function () {
 // 録音君の本体（rokuon.html）より前に読む。本体は window.gijiToken() があれば送りを「oauth」にして、
 // 返った許可の鍵を受け口（会社の人だけの GAS）へ access_token として付ける（本体 0.7.0 に入口あり）。
 // 設定＝window.GIJI_KYOKA = { id: OAuth クライアントID, hd: 会社のドメイン（例 "example.co.jp"）, modori: 戻り先（登録した URL と1字違わず） }
-// 実測 2026-11-25：受け口は drive.file だけの鍵で届く（openid・email だけでは 401）。
+// 実測 2026-11-25：受け口は drive.readonly の鍵＋受け口のスクリプトを会社の人へ表示共有、で届く（drive.file は置き場ごとなので届かない）。
 // 罠メモ：①録音中は Google へ飛ばない（ページを離れると録音が切れる）＝鍵が切れたら送りは後回し、録音が済んでから取り直す。
 //         ②戻ってきた時、許可の鍵は URL の # の後ろに来る＝読んだらすぐ消し、飛ぶ前の URL（#u=&k= を含む）へ戻す。
 //         ③自動で飛ぶのは 1分に1回まで（断られた時に行ったり来たりしない）。だめな時は画面の下に「許可する」の札を1つ出す。
@@ -2905,6 +2905,17 @@ var GijiAddon = (function () {
       mailShiraberu();
     }
   }
+  // 受け口の住所を会社の形（/a/macros/<会社>/s/…）に直す。普通の形（/macros/s/…）だと最初の乗り換えに
+  // 「よそのページから読んでよい」の札が無く、ブラウザが止める（2026-11-25 実測：会社の形なら最初から札あり）
+  function kaishaUke(u) { return C.hd && /^https:\/\/script\.google\.com\/macros\/s\//.test(u || "") ? u.replace("/macros/s/", "/a/macros/" + C.hd + "/s/") : u; }
+  window.__kyokaShiken = { kaishaUke: kaishaUke };   // 試験が直に確かめる口
+  try {
+    var hu = new URLSearchParams(String(location.hash || "").replace(/^#/, ""));
+    if (hu.get("u") && kaishaUke(hu.get("u")) !== hu.get("u")) { hu.set("u", kaishaUke(hu.get("u"))); history.replaceState(null, "", location.pathname + location.search + "#" + hu.toString()); }
+    var lk = JSON.parse(localStorage.getItem("rokuon_link") || "null");
+    if (lk && lk.u && kaishaUke(lk.u) !== lk.u) { lk.u = kaishaUke(lk.u); localStorage.setItem("rokuon_link", JSON.stringify(lk)); }
+  } catch (e) {}
+
   // 会社のアカウントか確かめ、次に Google へ行く時に「この人で」と伝える（選ぶ画面を出さないため）
   // 鍵を使う前に必ず通す（確かめが済むまで本体へ鍵を渡さない）。電波などで確かめられない時は渡す（受け口が会社の人か見るので漏れない）
   var mailP = null;
@@ -3028,10 +3039,11 @@ var MIC_E = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAAEICAYAAACj9mr/A
         history.replaceState(null, "", location.pathname + (qt ? "?" + qt : "") + (ht ? "#" + ht : ""));
       } catch (e) {}
     }
-    if (CFG.k && CFG.uke) CFG.link = location.origin + location.pathname + "?openExternalBrowser=1#u=" + encodeURIComponent(CFG.uke) + "&k=" + encodeURIComponent(CFG.k);
+    if (CFG.k && CFG.uke) CFG.link = location.origin + location.pathname + "?openExternalBrowser=1#u=" + encodeURIComponent(CFG.uke) + "&k=" + encodeURIComponent(CFG.k)
+      + (q.get("d") ? "&d=" + encodeURIComponent(q.get("d")) : "");   // 外に置く版：会社のドメイン（許可の部品が読む）も写す
   }
-  CFG.ver = CFG.ver || 12;
-  CFG.verName = CFG.verName || "0.7.1";
+  CFG.ver = CFG.ver || 13;
+  CFG.verName = CFG.verName || "0.8.0";
   CFG.chunk = Number(CFG.chunk) || 300;          // 小分けの長さ（秒）。約束＝5分
   CFG.kagiMs = Number(CFG.kagiMs) || 60000;      // 鍵を断られた後、また確かめるまでの間
   CFG.kakera = Number(CFG.kakera) || 5;          // 端末にしまう間隔（秒）。ページが落ちても、ここまでは残る
