@@ -141,9 +141,11 @@
   .readout > div { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; text-align:center;
     transition:opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1); }
   .r-rec { opacity:0; transform:translateY(8px); }
+  /* 背の低い画面（SE の Safari 548 など）：録音前は上の一言の場所を詰めて、真ん中の丸に場所をゆずる */
+  @media (max-height:600px) { body:not(.rec) .readout { height:min(calc(36px + 28px * var(--bai)), 68px); margin-top:4px; } }
   body.rec .r-idle { opacity:0; transform:translateY(-8px); }
   body.rec .r-rec { opacity:1; transform:none; }
-  .hint { font-size:calc(17px * var(--bai)); letter-spacing:.02em; line-height:1.4; }
+  .hint { font-size:min(calc(17px * var(--bai)), 3.6svh); letter-spacing:.02em; line-height:1.4; }
   .maiku { font-size:calc(13px * var(--bai)); color:var(--sub); white-space:pre-line; line-height:1.4; }
   .maiku.kawatta { color:var(--rec); font-weight:700; }
   .fun { font-family:Inter, sans-serif; font-weight:200; font-size:64px; line-height:1; letter-spacing:-.01em; font-variant-numeric:tabular-nums; }
@@ -181,7 +183,7 @@
   .links .oshiBtn, body.rec .links .oshiBtn.miseru { display:none; font-size:calc(13.5px * var(--bai)); font-weight:400; color:var(--sub); background:none; border:0; border-radius:8px; padding:8px; line-height:normal; width:auto; max-width:none; box-shadow:none; }
   .links .oshiBtn.miseru, body.rec .links .oshiBtn.miseru { display:inline-block; }
   .links .oshiBtn.midoku { color:var(--accent); font-weight:700; background:none; }
-  .shirase { text-align:center; font-size:calc(13.5px * var(--bai)); color:var(--sub); margin:6px 0 12px; min-height:20px; white-space:pre-line; line-height:1.45; transition:color .3s; flex:none; }
+  .shirase { text-align:center; font-size:min(calc(13.5px * var(--bai)), 2.9svh); color:var(--sub); margin:6px 0 12px; min-height:20px; white-space:pre-line; line-height:1.45; transition:color .3s; flex:none; }
   .shirase.kiiro { color:var(--wait); font-weight:700; }
   .foot { display:flex; align-items:center; justify-content:space-between; gap:10px; padding-top:10px; border-top:1px solid var(--line); flex:none; }
   .sw { display:inline-flex; align-items:center; gap:10px; font-size:calc(14px * var(--bai)); white-space:nowrap; }
@@ -200,13 +202,13 @@
   body.denwa.rec .denwaHanasu { display:block; }
   body.denwa.rec .shirase { display:none; }
   .ikenFuda, .ikenHanasu, .rokuonchu { display:none; }
-  .riyuuBtn { display:none; align-self:center; flex:none; font-size:calc(15px * var(--bai)); font-weight:700; color:var(--accent); background:var(--surface);
+  .riyuuBtn { display:none; align-self:center; flex:none; font-size:min(calc(15px * var(--bai)), 3.2svh); font-weight:700; color:var(--accent); background:var(--surface);
     border:1px solid var(--line); border-radius:99px; padding:9px 18px; box-shadow:var(--shadow); margin-top:4px; }
   .riyuuBtn.miseru { display:block; }
   .riyuuBtn:disabled { opacity:.5; }
   body.rec .riyuuBtn { display:none; }
   .tomatta { display:none; position:absolute; left:16px; right:16px; top:calc(58px + env(safe-area-inset-top)); z-index:6; background:#fff59d; color:#000;
-    font-size:calc(18px * var(--bai)); font-weight:700; line-height:1.45; border:3px solid #f57f17; border-radius:14px; padding:10px 12px; text-align:center; }
+    font-size:min(calc(18px * var(--bai)), 3.7svh); font-weight:700; line-height:1.45; border:3px solid #f57f17; border-radius:14px; padding:10px 12px; text-align:center; }
   .tomatta.miseru { display:block; }
   body.rec .tomatta { display:none; }
   .tomatta .chiisai { font-size:.75em; font-weight:400; margin-top:4px; }
@@ -223,6 +225,19 @@
   .ireru ol { margin:6px 0 8px; padding-left:1.5em; }
   .ireru .ato { height:34px; padding:0 16px; border-radius:17px; background:var(--surface2); border:1px solid var(--line); margin-top:6px; }
   .ireru.soto { border-color:var(--wait); }
+  /* 小さい画面でも録音の丸を隠さない：はじめは1行（やり方／あとで）、押した時だけ手順を広げる */
+  .ireru .ireruUe { display:flex; align-items:center; gap:8px; }
+  .ireru .ireruUe b { min-width:0; font-size:min(calc(16px * var(--bai)), 3.3svh); }
+  .ireru .ireruUe button { flex:none; white-space:nowrap; }
+  .ireru .ireruUe b { flex:1 1 auto; }
+  .ireru .ireruUe button { margin-top:0; }
+  .ireru .yarikata { height:34px; padding:0 16px; border-radius:17px; background:var(--accent); color:#fff; border:0; font-weight:700; }
+  .ireru .naka { display:none; }
+  .ireru.hiraku .naka { display:block; }
+  .ireru.hiraku .yarikata { display:none; }
+  .ireru.miseru:not(.hiraku):not(.soto) { font-size:min(calc(14.5px * var(--bai)), 3.1svh); position:static; transform:none; width:auto; max-width:none; margin:0 0 6px; padding:6px 8px 6px 12px; flex:none; max-height:none; overflow:visible; }
+  .ireru.miseru:not(.hiraku) .ireruUe button { height:32px; padding:0 12px; }
+  .ireru .ireruUe b { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   /* 下から出る紙（録音は止めない） */
   .scrim { position:fixed; inset:0; background:var(--scrim); opacity:0; pointer-events:none; transition:opacity .3s; z-index:20; }
   .sheet { position:fixed; left:50%; bottom:0; width:100%; max-width:430px; height:76%; transform:translate(-50%,104%); z-index:21; background:var(--surface);
@@ -308,7 +323,7 @@
   <div class="tmObi" id="tmObi"></div>
   <div class="denwaFuda">📞 電話のあと</div>
   <div class="ikenFuda" id="ikenFuda"></div>
-  <div class="tomatta" id="tomatta"><span class="ku">録音が</span><span class="ku">止まっていました。</span><br><span class="ku">もう一度</span><span class="ku">押してください。</span><div class="chiisai"><span class="ku">（止まるまでの録音は、</span><span class="ku">ちゃんと残っています）</span></div></div>
+  <div class="tomatta" id="tomatta"><span class="ku">録音が止まっていました。</span><br><span class="ku">もう一度押してください。</span><div class="chiisai"><span class="ku">（止まるまでの録音は、</span><span class="ku">ちゃんと残っています）</span></div></div>
   <section class="readout" id="readout">
     <div class="r-idle"><div class="hint" id="hint">押すと、その場で録音がはじまります</div><div class="maiku" id="maikuMae"></div></div>
     <div class="r-rec" aria-live="off"><div class="fun" id="fun"><span id="funJi">0:00</span></div><div class="maiku" id="maiku"></div></div>
@@ -329,11 +344,11 @@
   <div class="ikenHanasu"></div>
   <button id="riyuuBtn" class="riyuuBtn" type="button"><span class="ku">理由を読み上げて</span><span class="ku">はじめる</span></button>
   <div class="shirase" id="shirase"></div>
+  <div class="ireru" id="ireru"></div>
   <footer class="foot" id="foot">
     <button type="button" class="sw" id="oto" role="switch" aria-checked="true"><span class="tr"></span>開始の音</button>
     <div class="links"><button type="button" class="oshiBtn" id="oshiBtn" data-a="oshi">お知らせ</button><button type="button" data-a="hayaku">すぐ開くには</button><button type="button" data-a="bug">バグ報告</button><button type="button" data-a="goiken">改善要望</button></div>
   </footer>
-  <div class="ireru" id="ireru"></div>
 </div>
 <div class="scrim" id="scrim"></div>
 <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle">
@@ -2869,7 +2884,7 @@ var GijiAddon = (function () {
   if (!C.id) return;                                   // 設定が無い置き場（小窓・PC の試験）では何もしない
   var AUTH = C.auth || "https://accounts.google.com/o/oauth2/v2/auth";
   var USERINFO = C.userinfo || "https://openidconnect.googleapis.com/v1/userinfo";
-  var SCOPE = "openid email https://www.googleapis.com/auth/drive.file";
+  var SCOPE = C.scope || "openid email https://www.googleapis.com/auth/drive.readonly";   // 受け口（DOMAIN の GAS）はドライブの許可が要る。drive.file は置き場ごとなので届かない（2026-11-25 実測）
   var MODORI = C.modori || location.origin + location.pathname;
   var KEY = "rokuon_kyoka", NAGARE = "rokuon_kyoka_nagare", JIDOU_MS = 60000, YOYUU_MS = 120000;
   function yomu(k) { try { return JSON.parse(localStorage.getItem(k) || "null") || {}; } catch (e) { return {}; } }
@@ -3015,8 +3030,8 @@ var MIC_E = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAAEICAYAAACj9mr/A
     }
     if (CFG.k && CFG.uke) CFG.link = location.origin + location.pathname + "?openExternalBrowser=1#u=" + encodeURIComponent(CFG.uke) + "&k=" + encodeURIComponent(CFG.k);
   }
-  CFG.ver = CFG.ver || 11;
-  CFG.verName = CFG.verName || "0.7.0";
+  CFG.ver = CFG.ver || 12;
+  CFG.verName = CFG.verName || "0.7.1";
   CFG.chunk = Number(CFG.chunk) || 300;          // 小分けの長さ（秒）。約束＝5分
   CFG.kagiMs = Number(CFG.kagiMs) || 60000;      // 鍵を断られた後、また確かめるまでの間
   CFG.kakera = Number(CFG.kakera) || 5;          // 端末にしまう間隔（秒）。ページが落ちても、ここまでは残る
@@ -3573,12 +3588,14 @@ var MIC_E = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAAEICAYAAACj9mr/A
     el.innerHTML = NAKA
       ? "<b><span class=\"ku\">Safari で</span><span class=\"ku\">開きなおしてください</span></b><br><span class=\"ku\">今は、ほかのアプリの</span><span class=\"ku\">中の画面です。</span><br>"
         + "<span class=\"ku\">画面の下か上の「…」か、</span><span class=\"ku\">方位磁石の絵を押して、</span><br><span class=\"ku\">「Safari で開く」を</span><span class=\"ku\">押してください。</span>"
-      : "<b>次から、すぐ開けるように</b><ol><li>画面の右下の「…」を押す<br>（無い時は、四角から矢印が出ている絵）</li>"
+      : "<div class=\"ireruUe\"><b>すぐ開けるように</b><button class=\"yarikata\" type=\"button\" id=\"ireruYari\">やり方</button><button class=\"ato\" type=\"button\" id=\"ireruAto\">あとで</button></div><div class=\"naka\"><ol><li>画面の右下の「…」を押す<br>（無い時は、四角から矢印が出ている絵）</li>"
         + "<li>「共有」を押す</li><li>「ホーム画面に追加」を押す<br>（見当たらない時は「その他」を押すと出ます）</li><li>右上の「追加」を押す</li></ol>"
         + "次からは、ホーム画面の赤い「録」を押すだけです。<br>"
-        + "<span class=\"ku\">録音中に画面が暗くなる時は、</span><span class=\"ku\">「設定」→「画面表示と明るさ」→</span><span class=\"ku\">「自動ロック」→「なし」</span><span class=\"ku\">にしてください。</span><br>"
-        + "<button class=\"ato\" type=\"button\" id=\"ireruAto\">あとで</button>";
+        + "<span class=\"ku\">録音中に画面が暗くなる時は、</span><span class=\"ku\">「設定」→「画面表示と明るさ」→</span><span class=\"ku\">「自動ロック」→「なし」</span><span class=\"ku\">にしてください。</span></div>";
+    el.classList.remove("hiraku");
     el.classList.add("miseru");
+    var y = $("ireruYari");
+    if (y) y.addEventListener("click", function () { el.classList.add("hiraku"); });
     var b = $("ireruAto");
     if (b) b.addEventListener("click", function () { try { sessionStorage.setItem("rokuon_ireru_ato", "1"); } catch (e) {} el.classList.remove("miseru"); });
   }
@@ -4396,10 +4413,11 @@ var MIC_E = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQgAAAEICAYAAACj9mr/A
   function fit() {
     var s = $("stage").getBoundingClientRect();
     if (!s.height) return;
-    var k = Math.min(1, (s.width + 8) / 340, s.height / 366);
-    $("orbit").style.setProperty("--k", Math.max(.6, k).toFixed(3));
+    var k = Math.min(1, (s.width + 8) / 340, (s.height - 14) / 366);   // 上下に7pxずつ間をあける（下の一言が「説明」「追加」に詰まらない）
+    $("orbit").style.setProperty("--k", Math.max(.58, k).toFixed(3));   // .58＝録音の丸が 88px（親指で押せる大きさ）
   }
   addEventListener("resize", fit);
+  try { new ResizeObserver(function () { fit(); }).observe($("stage")); } catch (e) {}
   // 丸のまわりの輪（72本の線。録音中は声の強さで伸びる）と、上の小札の時計・棒
   var RING = { lv: 0, yureru: false, cx: null };
   try { RING.cx = $("ring").getContext("2d"); } catch (e) {}
